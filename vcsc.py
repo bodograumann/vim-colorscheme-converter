@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+
+import sys
+
 colortable = (
     (0x0,  0x0,  0x0),  (0xcd, 0x0,  0x0),  (0x0,  0xcd, 0x0),  (0xcd, 0xcd, 0x0),
     (0x0,  0x0,  0xee), (0xcd, 0x0,  0xcd), (0x0,  0xcd, 0xcd), (0xe5, 0xe5, 0xe5),
@@ -66,53 +69,54 @@ colortable = (
     (0xd0, 0xd0, 0xd0)
 )
 
-import sys
-
 def rgb2xterm(rgb):
-    min = 1000000
-    mini = 0
-    i = 0
-    for c in colortable:
-        dist = (c[0]-rgb[0])**2+(c[1]-rgb[1])**2+(c[2]-rgb[2])**2
-        if dist < min:
-            min = dist
-            mini = i
-        i += 1
-    return mini
+    best_distance = float('inf')
+    best_match = None
+    for number, color in enumerate(colortable):
+        distance = sum((x - y) ** 2 for x, y in zip(color, rgb))
+        if distance < best_distance:
+            best_distance = distance
+            best_match = number
 
-def add_console_colors(l):
+    return best_match
+
+def add_console_colors(line):
     indent = ''
-    for char in l:
+    for char in line:
         if char != '\t' and char != ' ':
             break
         indent += char
 
-    token = l.split()
-    if not token:
-        return l
+    tokens = line.split()
+    if not tokens:
+        return line
 
-    command = token[0].rstrip('!')
+    command = tokens[0].rstrip('!')
     if command != 'highlight'[:len(command)]:
-        return l
+        return line
 
     new_tokens = []
-    for t in token:
-        new_tokens.append(t)
-        if t.startswith('guifg=#'):
-            c = t.partition('guifg=#')[2]
-            r = int(c[0:2],16)
-            g = int(c[2:4],16)
-            b = int(c[4:6],16)
+    for token in tokens:
+        new_tokens.append(token)
+
+        if token.startswith('guifg=#'):
+            color = token.partition('guifg=#')[2]
+            r = int(color[0:2],16)
+            g = int(color[2:4],16)
+            b = int(color[4:6],16)
             new_tokens.append('ctermfg=%d' % rgb2xterm((r,g,b)))
-        elif t.startswith('guibg=#'):
-            c = t.partition('guibg=#')[2]
-            r = int(c[0:2],16)
-            g = int(c[2:4],16)
-            b = int(c[4:6],16)
+
+        elif token.startswith('guibg=#'):
+            color = token.partition('guibg=#')[2]
+            r = int(color[0:2],16)
+            g = int(color[2:4],16)
+            b = int(color[4:6],16)
             new_tokens.append('ctermbg=%d' % rgb2xterm((r,g,b)))
-        elif t.startswith('gui='):
-            option = t.partition('gui=')[2]
+
+        elif token.startswith('gui='):
+            option = token.partition('gui=')[2]
             new_tokens.append('cterm=' + option)
+
     return indent + ' '.join(new_tokens) + '\n'
 
 def main():
@@ -120,8 +124,8 @@ def main():
         print('usage: vcsc in.vim out.vim')
         exit(1)
 
-    with open(sys.argv[1], 'r') as f, open(sys.argv[2], 'w') as o:
-        o.writelines(map(add_console_colors, f))
+    with open(sys.argv[1], 'r') as input, open(sys.argv[2], 'w') as output:
+        output.writelines(map(add_console_colors, input))
 
 if __name__ == '__main__':
     main()
