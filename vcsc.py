@@ -81,7 +81,7 @@ def rgb2xterm(rgb):
 
 def main():
     if len(sys.argv) < 3:
-        print 'usage: vcsc in.vim out.vim'
+        print('usage: vcsc in.vim out.vim')
         exit(1)
     f = open(sys.argv[1], 'r')
     o = open(sys.argv[2], 'w')
