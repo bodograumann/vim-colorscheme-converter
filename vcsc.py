@@ -87,30 +87,31 @@ def main():
     o = open(sys.argv[2], 'w')
     for l in f:
         token = l.split()
-        if len(token) == 0:
+        if not token:
+            o.write(l)
             continue
         elif token[0] != 'hi':
             o.write(l)
             continue
-        else:
-            for t in token:
-                if t.startswith('guifg=#'):
-                    c = t.partition('guifg=#')[2]
-                    r = int(c[0:2],16)
-                    g = int(c[2:4],16)
-                    b = int(c[4:6],16)
-                    o.write(t+' ')
-                    o.write('ctermfg=%d ' % rgb2xterm((r,g,b)))
-                elif t.startswith('guibg=#'):
-                    c = t.partition('guibg=#')[2]
-                    r = int(c[0:2],16)
-                    g = int(c[2:4],16)
-                    b = int(c[4:6],16)
-                    o.write(t+' ')
-                    o.write('ctermbg=%d ' % rgb2xterm((r,g,b)))
-                else:
-                    o.write(t+' ')
-            o.write('\n')
+
+        for t in token:
+            if t.startswith('guifg=#'):
+                c = t.partition('guifg=#')[2]
+                r = int(c[0:2],16)
+                g = int(c[2:4],16)
+                b = int(c[4:6],16)
+                o.write(t+' ')
+                o.write('ctermfg=%d ' % rgb2xterm((r,g,b)))
+            elif t.startswith('guibg=#'):
+                c = t.partition('guibg=#')[2]
+                r = int(c[0:2],16)
+                g = int(c[2:4],16)
+                b = int(c[4:6],16)
+                o.write(t+' ')
+                o.write('ctermbg=%d ' % rgb2xterm((r,g,b)))
+            else:
+                o.write(t+' ')
+        o.write('\n')
 
 if __name__ == '__main__':
     main()
