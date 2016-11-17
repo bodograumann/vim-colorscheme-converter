@@ -81,11 +81,17 @@ def rgb2xterm(rgb):
     return mini
 
 def add_console_colors(l):
+    indent = ''
+    for char in l:
+        if char != '\t' and char != ' ':
+            break
+        indent += char
+
     token = l.split()
     if not token:
         return l
 
-    command = token[0].strip('!')
+    command = token[0].rstrip('!')
     if command != 'highlight'[:len(command)]:
         return l
 
@@ -104,7 +110,7 @@ def add_console_colors(l):
             g = int(c[2:4],16)
             b = int(c[4:6],16)
             new_tokens.append('ctermbg=%d' % rgb2xterm((r,g,b)))
-    return ' '.join(new_tokens) + '\n'
+    return indent + ' '.join(new_tokens) + '\n'
 
 def main():
     if len(sys.argv) < 3:
