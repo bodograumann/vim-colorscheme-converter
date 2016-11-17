@@ -110,6 +110,9 @@ def add_console_colors(l):
             g = int(c[2:4],16)
             b = int(c[4:6],16)
             new_tokens.append('ctermbg=%d' % rgb2xterm((r,g,b)))
+        elif t.startswith('gui='):
+            option = t.partition('gui=')[2]
+            new_tokens.append('cterm=' + option)
     return indent + ' '.join(new_tokens) + '\n'
 
 def main():
