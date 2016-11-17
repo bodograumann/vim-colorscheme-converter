@@ -90,7 +90,9 @@ def main():
         if not token:
             o.write(l)
             continue
-        elif token[0] != 'hi':
+
+        command = token[0].strip('!')
+        if command != 'highlight'[:len(command)]:
             o.write(l)
             continue
 
