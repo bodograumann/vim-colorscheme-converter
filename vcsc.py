@@ -80,6 +80,15 @@ def rgb2xterm(rgb):
 
     return best_match
 
+def parse_rgb(hex_color):
+    if len(hex_color) != 6:
+        raise ValueError('Invalid color! Must consist of 6 characters')
+    return (
+            int(hex_color[0:2], 16),
+            int(hex_color[2:4], 16),
+            int(hex_color[4:6], 16)
+            )
+
 def add_console_colors(line):
     indent = ''
     for char in line:
@@ -100,18 +109,14 @@ def add_console_colors(line):
         new_tokens.append(token)
 
         if token.startswith('guifg=#'):
-            color = token.partition('guifg=#')[2]
-            r = int(color[0:2],16)
-            g = int(color[2:4],16)
-            b = int(color[4:6],16)
-            new_tokens.append('ctermfg=%d' % rgb2xterm((r,g,b)))
+            hex_color = token.partition('guifg=#')[2]
+            closest = rgb2xterm(parse_rgb(hex_color))
+            new_tokens.append('ctermfg=%d' % closest)
 
         elif token.startswith('guibg=#'):
-            color = token.partition('guibg=#')[2]
-            r = int(color[0:2],16)
-            g = int(color[2:4],16)
-            b = int(color[4:6],16)
-            new_tokens.append('ctermbg=%d' % rgb2xterm((r,g,b)))
+            hex_color = token.partition('guibg=#')[2]
+            closest = rgb2xterm(parse_rgb(hex_color))
+            new_tokens.append('ctermbg=%d' % closest)
 
         elif token.startswith('gui='):
             option = token.partition('gui=')[2]
