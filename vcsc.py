@@ -113,10 +113,16 @@ def add_console_colors(line):
             closest = rgb2xterm(parse_rgb(hex_color))
             new_tokens.append('ctermfg=%d' % closest)
 
+        elif token == 'guifg=NONE':
+            new_tokens.append('ctermfg=NONE')
+
         elif token.startswith('guibg=#'):
             hex_color = token.partition('guibg=#')[2]
             closest = rgb2xterm(parse_rgb(hex_color))
             new_tokens.append('ctermbg=%d' % closest)
+
+        elif token == 'guibg=NONE':
+            new_tokens.append('ctermbg=NONE')
 
         elif token.startswith('gui='):
             option = token.partition('gui=')[2]
